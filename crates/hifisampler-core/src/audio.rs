@@ -553,7 +553,7 @@ pub fn loudness_normalize(
         output[trim_start + i] = audio[trim_start + i] * gain * fade;
     }
 
-    // Crossfade remaining tail from original audio
+    // Crossfade remaining tail from original audio (also apply gain for consistency)
     let remain_start = trim_start + available_length;
     if remain_start < original_length {
         let remain_length = original_length - remain_start;
@@ -564,7 +564,8 @@ pub fn loudness_normalize(
             } else {
                 1.0
             };
-            output[remain_start + i] = audio[remain_start + i] * fade_in;
+            // Apply same gain to tail for consistent loudness, then fade in
+            output[remain_start + i] = audio[remain_start + i] * gain * fade_in;
         }
     }
 
