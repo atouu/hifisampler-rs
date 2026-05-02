@@ -108,7 +108,7 @@ begin
     '（通常位于 C:\Users\你的用户名\OpenUtau\Resamplers）',
     False, '');
   OpenUtauDirPage.Add('');
-  OpenUtauDirPage.Values[0] := ExpandConstant('{app}');
+  OpenUtauDirPage.Values[0] := ExpandConstant('{userprofile}\OpenUtau\Resamplers');
 end;
 
 function ShouldSkipPage(PageID: Integer): Boolean;
