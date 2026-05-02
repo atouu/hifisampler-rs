@@ -10,7 +10,7 @@ resolver = "2"
 edition = "2024"
 license = "MIT"
 repository = "https://github.com/openhachimi/hifisampler"
-version = "0.1.5"
+version = "0.1.6"
 
 [workspace.dependencies]
 # Async runtime

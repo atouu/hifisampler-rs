@@ -98,6 +98,17 @@ Filename: "{app}\{#MyAppExeName}"; Description: "启动 HiFiSampler Server"; Fla
 var
   OpenUtauDirPage: TInputDirWizardPage;
 
+function DefaultOpenUtauResamplersDir: String;
+var
+  UserProfile: String;
+begin
+  UserProfile := GetEnv('USERPROFILE');
+  if UserProfile <> '' then
+    Result := AddBackslash(UserProfile) + 'OpenUtau\Resamplers'
+  else
+    Result := '';
+end;
+
 procedure InitializeWizard;
 begin
   OpenUtauDirPage := CreateInputDirPage(wpSelectTasks,
@@ -108,7 +119,7 @@ begin
     '（通常位于 C:\Users\你的用户名\OpenUtau\Resamplers）',
     False, '');
   OpenUtauDirPage.Add('');
-  OpenUtauDirPage.Values[0] := ExpandConstant('{userprofile}\OpenUtau\Resamplers');
+  OpenUtauDirPage.Values[0] := DefaultOpenUtauResamplersDir;
 end;
 
 function ShouldSkipPage(PageID: Integer): Boolean;
