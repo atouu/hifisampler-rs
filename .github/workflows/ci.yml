@@ -268,7 +268,7 @@ jobs:
         shell: bash
         run: |
           echo "Downloading ONNX Runtime from ${{ matrix.ort_url }}..."
-          mkdir -p ort_extract
+          mkdir -p ort_lib
           curl -fSL --retry 3 "${{ matrix.ort_url }}" -o ort_lib/libonnxruntime.so
 
           echo "=== ORT libraries for variant '${{ matrix.variant }}' ==="
