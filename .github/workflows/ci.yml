@@ -207,6 +207,13 @@ jobs:
             ort_source: github
             ort_url: "https://github.com/microsoft/onnxruntime/releases/download/v1.24.1/onnxruntime-linux-x64-1.24.1.tgz"
             ort_dir: "onnxruntime-linux-x64-1.24.1"
+          # ── Linux WebGPU ──
+          - os: ubuntu-24.04
+            platform: linux-x64
+            variant: webgpu
+            artifact: hifisampler-linux-x64-webgpu
+            ort_source: direct
+            ort_url: "https://unpkg.com/onnxruntime-node@1.24.1/bin/napi-v6/linux/x64/libonnxruntime.so.1"
           # ── Linux CUDA (includes TensorRT) ──
           - os: ubuntu-24.04
             platform: linux-x64
@@ -254,6 +261,18 @@ jobs:
             ort_nuget.nupkg
             ort_nuget_extract
           key: ${{ runner.os }}-ort-${{ matrix.platform }}-${{ matrix.variant }}-${{ matrix.ort_source }}-${{ env.ORT_VERSION }}-${{ matrix.nuget_ver }}
+
+      # ── Direct ONNX Runtime Download ──
+      - name: Download ORT (Direct)
+        if: matrix.ort_source == 'direct' && steps.cache-ort.outputs.cache-hit != 'true'
+        shell: bash
+        run: |
+          echo "Downloading ONNX Runtime from ${{ matrix.ort_url }}..."
+          mkdir -p ort_extract
+          curl -fSL --retry 3 "${{ matrix.ort_url }}" -o ort_lib/libonnxruntime.so
+
+          echo "=== ORT libraries for variant '${{ matrix.variant }}' ==="
+          ls -lh ort_lib/
 
       # ── Download ONNX Runtime from GitHub releases ──
       - name: Download ORT (GitHub Release)

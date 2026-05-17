@@ -7,7 +7,7 @@
 //! Note: ROCm EP was removed from ONNX Runtime 1.23+. AMD users should use
 //! MIGraphX EP or the DirectML EP (which also supports AMD GPUs on Windows).
 
-use ort::ep::{CoreML, DirectML, ExecutionProvider, ExecutionProviderDispatch, TensorRT, CUDA};
+use ort::ep::{CoreML, DirectML, WebGPU, ExecutionProvider, ExecutionProviderDispatch, TensorRT, CUDA};
 use serde::Serialize;
 use tracing::{info, warn};
 
@@ -26,6 +26,7 @@ pub fn detect_ep_capabilities() -> EpCapabilities {
     let mut available_devices = vec!["auto".to_string(), "cpu".to_string()];
     let mut available_eps_raw = vec!["CPUExecutionProvider".to_string()];
 
+    let webgpu_ok = WebGPU::default().is_available().unwrap_or(false);
     let directml_ok = DirectML::default().is_available().unwrap_or(false);
     let cuda_ok = CUDA::default().is_available().unwrap_or(false);
     let trt_ok = TensorRT::default().is_available().unwrap_or(false);
@@ -46,6 +47,10 @@ pub fn detect_ep_capabilities() -> EpCapabilities {
     if coreml_ok {
         available_devices.push("coreml".to_string());
         available_eps_raw.push("CoreMLExecutionProvider".to_string());
+    }
+    if webgpu_ok {
+        available_devices.push("webgpu".to_string());
+        available_eps_raw.push("WebGpuExecutionProvider".to_string());
     }
 
     EpCapabilities {
@@ -96,6 +101,10 @@ pub fn build_execution_providers(device: &str, device_id: i32) -> Vec<ExecutionP
             info!("Device=coreml: registering CoreML execution provider");
             vec![CoreML::default().build()]
         }
+        "webgpu" => {
+            info!("Device=webgpu: registering WebGPU execution provider");
+            vec![WebGPU::default().build()]
+        }
         other => {
             warn!(
                 "Unknown device '{}', falling back to CPU. \
@@ -129,6 +138,7 @@ fn auto_providers() -> Vec<ExecutionProviderDispatch> {
             any(target_arch = "x86_64", target_arch = "aarch64")
         )
     )) {
+        eps.push(WebGPU::default().build());
         eps.push(TensorRT::default().build());
         eps.push(CUDA::default().build());
     }
